@@ -1,0 +1,73 @@
+# docker-compose config
+# docker-compose up -d
+# docker-compose down
+
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:latest
+    container_name: mongo
+    volumes:
+      - /var/lib/docker/volumes/mongodb-docker/_data
+    ports:
+      - "27017:27017"
+  
+  postgres:
+    image: postgres:latest
+    container_name: postgres
+    volumes:
+      - /var/lib/docker/volumes/postgres-docker/_data
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_DB=todo
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+
+  maildev:
+    image: maildev/maildev
+    ports:
+      - "1080:1080"
+      - "25:25"
+
+  eureka-server:
+    image: atesanilerdem/todo-app:discovery-service
+    ports:
+      - "8761:8761"
+
+  spring-gateway:
+    image: atesanilerdem/todo-app:api-gateway
+    container_name: c_api_gateway
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka
+    ports:
+      - "8080:8080"
+    depends_on:
+      - eureka-server
+
+  auth-service:
+    image: atesanilerdem/todo-app:auth-service
+    container_name: c_auth_service
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/todo
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=postgres
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka
+      - spring.mail.host=maildev
+    depends_on:
+      - postgres
+    ports:
+      - "8081:8081"
+
+  todo-api:
+    image: atesanilerdem/todo-app:todo-api
+    container_name: c_my_todo_app
+    environment:
+      - MONGODB_URI=mongodb://mongodb:27017/todo_app
+      # There is an issue with eureka-client.js. It is not able to resolve the eureka uri properly. Just use the service name instead of the uri.
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=eureka-server
+    depends_on:
+      - mongodb
+    ports:
+      - "8085:8085" 
