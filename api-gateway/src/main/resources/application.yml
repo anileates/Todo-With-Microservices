@@ -1,0 +1,19 @@
+spring:
+  cloud: 
+    gateway:
+      routes:
+        - id: todo-service
+          uri: lb://todo-service # ? This is the name of the registred service in Eureka
+          predicates:
+            - Path=/api/v1/todo/** # * if the path is /api/v1/todo, it will be redirected to todo-service
+          filters:
+            - AuthenticationFilter
+
+
+        - id: auth-service
+          uri: lb://auth-service
+          predicates:
+            - Path=/api/v1/auth/**
+          
+  application:
+    name: api-gateway
