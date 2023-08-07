@@ -10,8 +10,10 @@ The primary purpose of this project is to learn and get familiar with Java Sprin
 - **PostgreSQL** & **MongoDB** for database
 
 ### How to run ⚙
-You can download the repository and run one by one all the microservices seperatly. Do not forget to edit `.properties` and `.env` files to add JWT and database configurations.
+You can download the repository and run one by one all the microservices separately. Do not forget to edit `.properties` and `.env` files to add JWT and database configurations.
 
 **OR** 
 
-Simply download and run the Docker Compose file.  
+Simply download and run the [Docker Compose file][1].  
+
+[1]: https://github.com/anileates/Todo-With-Microservices/blob/b41738017a8c65ed2330967bf7709da993b342ca/docker-compose.yml
